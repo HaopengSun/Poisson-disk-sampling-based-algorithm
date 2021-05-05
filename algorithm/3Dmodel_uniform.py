@@ -88,19 +88,11 @@ for ideal_distribution in ideal_distributions:
 	ideal_masses.append(ideal_mass)
 
 def main_program():
-	# import_data()
 	setup()
 	for i in range(len(sieves)):
 		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	list_particles()
 	exportdata()
-
-def import_data():
-	with open('3d-yade-round4.csv') as csvfile:
-		readCSV = csv.reader(csvfile, delimiter=',')
-		for row in readCSV:
-			Circles.append(Circle(int(row[0]), int(row[1]), int(row[2]), int(row[3])))
-		print("import data")
 
 class Circle:
 	def __init__(self, x, y, z, r):
