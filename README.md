@@ -3,3 +3,7 @@
 ## Poisson Disk Sampling algorithm
 
 ## Voids infilling by Grid Sampling
+
+## 2D model visualization
+
+## Yade deposition model

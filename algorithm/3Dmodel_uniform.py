@@ -67,7 +67,7 @@ finers = []
 occupation8 = 0
 
 #users should input the parameters of the soil in the first place
-target_void_ratio = 1
+target_void_ratio = 0.8
 sieves = ['4.75-2.36', '2.36-1.18', '1.18-0.6', '0.6-0.3', '0.3-0.15']
 soil_distributions = [1, 0.92, 0.82, 0.58, 0.14]
 ideal_distributions = [0.08, 0.10, 0.24, 0.44, 0.14]
@@ -267,21 +267,13 @@ def remove_grids(roundRadius):
 
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
-	# reset the sub-grid
-	grid1 = list(range(0, gridnumbers1))
-
-	# eliminate the filly covered cells
 	remove_grids(roundRadius)
 
-	# conclude an array of the numbers of all non-filled cells
-	void_grid = []
-	non_filled_cells = 0
 	for i in range(gridnumbers1):
 		if grid1[i] != -1:
 			void_grid.append(grid1[i])
-			non_filled_cells++
 	gridnum = void_grid
-	print('the number of non-filled cells for this round is ', non_filled_cells)
+	print(len(gridnum))
 
 	# the loop will stop if the mass of this round of infilling reaches the target or it runs out of void grids
 	# the size of divided grids is 5, which can normally covers all round of infilling
@@ -298,16 +290,12 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 			gridnum.remove(gridnum[q]) 
 			print(len(gridnum), totalvolume, ideal_volume)
 	
-	# if the function ends due to running out of all non-filled cells instead of reaching the target
-	# the function will rerun in an attemp to add more particles
 	if len(gridnum) == 0:
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
 	else:
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
-# after a valid point being found successfully
-# this function is incharge of deciding the particle radius
 def radii(q, initial_radius, range1, maximum1):
 
 	global occupation1
@@ -342,7 +330,7 @@ def radii(q, initial_radius, range1, maximum1):
 			else:
 				min_around.append(maximum1)
 
-    # find the particle radius and add this newly generated particle in the 'Circles' array
+    # find the minimum distance and generate particles
 	if valid is True:
 		min_a = np.amin(min_around)
 		if min_a <= min_b:
