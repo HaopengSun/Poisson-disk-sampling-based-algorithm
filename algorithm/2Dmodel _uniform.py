@@ -85,21 +85,11 @@ for ideal_distribution in ideal_distributions:
 	ideal_masses.append(ideal_mass)
 
 def main_program():
-	import_data()
-	# setup()
-	# for i in range(len(sieves)):
-	# 	if i > 0:
-	# 		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
-	# fill_the_void7(0)
+	setup()
+	for i in range(len(sieves)):
+		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	list_particles()
 	exportdata()
-
-def import_data():
-	with open('2d-uniform.csv') as csvfile:
-		readCSV = csv.reader(csvfile, delimiter=',')
-		for row in readCSV:
-			Circles.append(Circle(int(row[0]), int(row[1]), int(row[2])))
-		print("import data")
 
 class Circle:
 	def __init__(self, x, y, r):
@@ -228,7 +218,12 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	while totalvolume < ideal_volume and len(gridnum) > 0:
 		#randomly select a void grid and try to add particles
 		q = np.random.randint(len(gridnum))
-		n = infilling_the_voids(gridnum[q], roundRadius, rangeRadius, maximum)
+
+		if roundRadius != maximum:
+			n = radii(gridnum[q], roundRadius, rangeRadius, maximum)
+		else:
+			n = single_radius(gridnum[q], roundRadius, rangeRadius, maximum)
+
 		if n == 0:
 			gridnum.remove(gridnum[q])
 		else:
@@ -243,7 +238,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	else:
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
-def infilling_the_voids(q, initial_radius, range1, maximum1):
+def radii(q, initial_radius, range1, maximum1):
 
 	valid = True
 	yaxis = math.floor(q / cols1)
@@ -292,38 +287,9 @@ def infilling_the_voids(q, initial_radius, range1, maximum1):
 	else:
 		return 0
 
-def fill_the_void7(totalvolume1):
-
-	global occupation8
-
-	gridnum7 = list(range(0, gridnumbers1))
-
-	for i in range(len(Circles)):
-		col_sub = math.floor(Circles[i].x / w1)
-		row_sub = math.floor(Circles[i].y / w1)
-		numb = col_sub + row_sub * cols1
-		grid1[numb] = 1
-		gridnum7.remove(numb)
-
-	while totalvolume1 < ideal_volumes[7] and len(gridnum7) > 0:
-		q = np.random.randint(len(gridnum7))
-		n = infilling_the_voids7(gridnum7[q], seventhRoundRadia, range7, maximum7)
-		if n == 0:
-			gridnum7.remove(gridnum7[q])
-		else:
-			grid1[q] = 1
-			totalvolume1 = totalvolume1 + math.floor(3.1415926 * 2 * 2)
-			occupation8 = occupation8 + 1
-			gridnum7.remove(gridnum7[q])
-
-	print('round seventh of infilling and add' , occupation8)
-
-	if len(gridnum7) == 0:
-		fill_the_void7(totalvolume1)
-
 # for the last round of infilling, because there is only one possibility, generating particles with radius 2
 # the program simplifies the process of "adding particles"
-def infilling_the_voids7(q, initial_radius, range1, maximum1):
+def single_radius(q, initial_radius, range1, maximum1):
 
 	valid = True
 	yaxis = math.floor(q / cols1)
