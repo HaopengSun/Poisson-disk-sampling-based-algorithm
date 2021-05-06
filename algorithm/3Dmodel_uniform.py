@@ -1,27 +1,31 @@
 import random, math, csv, json
 import numpy as np
 
-# the dimension of 2D canvas
-# one unit in the program presents 0.0125mm and actual size of canvas is 12.5mm * 12.5mm
+# one unit in the program presents 0.05mm and actual size of canvas is 40mm * 40mm
 unit = 0.05
+
+# the dimension of 3D canvas
 width = 800
 height = 800
 depth = 800
+
+# active list used in the generation of points with Poisson Disk Sampling
 active = []
 pi = 3.1415926
 
 # for the "Poisson Disk Sampling", it is in charge of generating biggest particles with radius from 190 to 95
-# this part is still required to adjust manually and there are mainly two parameters to adjust, minimum distance between points and the maximum radius of circles
+# this part is still required to adjust manually and there are mainly two parameters to adjust,
+# minimum distance between points and the maximum radius of circles
 r = 200
 k = 30
 root = 2 ** 0.5
 w = r / root
 
-# 5 * 5 grid can roughly locate  minimum circles with radius which is set to be 2
-# divide the whole canvan with 5 * 5 grids, because it can roughly contain a minimum circle
+# cell size of 5 unit * 5 unit can locate void space for minimum circles with radius which is set to be 2
 w1 = 5
 
-# the maximum radius of big circles in first round of infilling is demanded to adjust, because the volume of circles in first round is so big
+# the maximum radius of big particles in first round of infilling is demanded to adjust,
+# because the volume of circles in first round is so big
 # if the program adds a new circle, the total volume in the sieve will go over the target so much
 # but without this circle, the total volume cannot hit the target
 # so setting the maximum radius of first round circles is necessary
@@ -36,9 +40,12 @@ w1 = 5
 # which can make sure the distribution curve stick to the ideal one
 # for the relatively small particles, this problem normally can be avoided
 
+# the maximum value of the radius range for the particle insertion round
 maximums = [95, 47, 23, 11, 5]
+# the minimum value of the radius range for the particle insertion round
 roundRadius = [48, 24, 12, 6, 2]
 
+# the range of the adjcent particles is to reduce the reseach field and the running time
 ranges = []
 for maximum in maximums:
 	ranges.append(maximum + maximums[0])
@@ -48,11 +55,13 @@ Circles = []
 growing = []
 occupation_poisson = 0
 
+# set cells
 cols = math.floor(width / w)
 rows = math.floor(height / w)
 depths = math.floor(depth / w)
 gridnumbers = cols * rows * depths
 
+# sett sub-cells
 cols1 = math.floor(width / w1)
 rows1 = math.floor(height / w1)
 depths1 = math.floor(depth / w1)
@@ -64,7 +73,6 @@ real_volumes = []
 masses = []
 differences = []
 finers = []
-occupation8 = 0
 
 #users should input the parameters of the soil in the first place
 target_void_ratio = 3
@@ -79,6 +87,7 @@ density = 0.001631
 volume = depth * width * height
 ideal_totalmass = (volume / (target_void_ratio + 1))
 
+# the ideal volume for each sieve
 ideal_volumes = []
 ideal_masses = []
 for ideal_distribution in ideal_distributions:
@@ -88,12 +97,17 @@ for ideal_distribution in ideal_distributions:
 	ideal_masses.append(ideal_mass)
 
 def main_program():
+	# the generation of the points with Poisson Disk Sampling distribution
 	setup()
+	# generate the remaining round of particles insertion
 	for i in range(len(sieves)):
 		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
+	# calculate the statistic results, the particle size distribution and the void ratio
 	list_particles()
+	# export CSV file which contains the positions and radii of particles
 	exportdata()
 
+# 'Sphere' or 'Circle' object
 class Circle:
 	def __init__(self, x, y, z, r):
 		self.x = x
@@ -132,9 +146,7 @@ def setup():
 
 #generate points of Poisson Disk Sampling
 def poisson():
-
 	global occupation_poisson
-
 	while len(active) > 0:
 		check = np.random.randint(0, len(active))
 		found = None
@@ -186,8 +198,8 @@ def poisson():
 
 	print('poisson disk sampling', occupation_poisson)
 
+# decide the radii for the particles with Poisson Disk Sampling
 def generateCircles_p(mindis, maxi):
-
 	for k in range(len(Circles)):
 		if Circles[k].g is True:
 			growing.append([Circles[k].x, Circles[k].y, Circles[k].z])
@@ -259,7 +271,7 @@ def remove_grids(roundRadius):
 
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
-	# reset the sub-grid
+	# reset the sub-cell
 	grid1 = list(range(0, gridnumbers1))
 
 	# eliminate the filly covered cells
@@ -279,8 +291,14 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	while totalvolume < ideal_volume and len(gridnum) > 0:
 		#randomly select a void grid and try to add particles
 		q = np.random.randint(len(gridnum))
-		n = radii(gridnum[q], roundRadius, rangeRadius, maximum)
+
+		if roundRadius != maximum:
+			n = radii(gridnum[q], roundRadius, rangeRadius, maximum)
+		else:
+			n = radius_single(gridnum[q], roundRadius, rangeRadius, maximum)
+
 		if n == 0:
+			# the randomly selected point inside the non-filled cell is invalid
 			gridnum.remove(gridnum[q])
 		else:
 			grid1[q] = 1
@@ -353,7 +371,8 @@ def radii(q, initial_radius, range1, maximum1):
 	else:
 		return 0
 
-
+# to reduce the running time, if the maximum radius and initial radius are equal,
+# the function does not need to decide the radius because it is pre-decided by the initial radius
 def radius_single(q, initial_radius, range1, maximum1):
 
 	valid = True
@@ -439,12 +458,6 @@ def list_particles():
 	totalmass = real_totalvolume * density
 	voidratio = ((width * height * depth * unit ** 3) - real_totalvolume) / real_totalvolume
 
-	# for i in range(sieve_number):
-	# 	finers.append(0)
-	# 	for j in range(sieve_number):
-	# 		if j <= i:
-	# 			finers[i] += real_volumes[j]
-	# 	finers[i] = round(finers[i] * density / totalmass, 4)
 	for i in range(sieve_number):
 		finers.append(0)
 		for j in range(sieve_number):
@@ -465,4 +478,3 @@ def list_particles():
 
 main_program()
 
-# , 'mass:', masses[i], 'difference:', differences[i]
