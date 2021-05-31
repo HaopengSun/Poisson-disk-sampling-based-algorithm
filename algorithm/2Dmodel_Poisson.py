@@ -207,7 +207,7 @@ def surpass_volume_poisson(multiplication):
 	volume_poisson = 0
 	for i in range(len(Circles)):
 		volume_poisson += pi * Circles[i].r ** 2
-	print(volume_poisson, ideal_volumes[0])
+	print('volume of Poisson Disk particles', volume_poisson, 'target volume',ideal_volumes[0])
 	if volume_poisson > (ideal_volumes[0] * multiplication):
 		return True
 	return False
@@ -244,7 +244,6 @@ def poisson(r):
 		r = r - 10
 		poisson(r)
 
-
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
 	gridnum = list(range(0, gridnumbers1))
@@ -277,8 +276,13 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	
 	# if the algorithm checks all non-filled cells but the volume still falls short of the target
 	if len(gridnum) == 0:
-		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+		print('all non-filled cells checked', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
+	elif totalvolume > ideal_volume * 1.02:
+		remove_particles(maximum, roundRadius)
+		if (maximum > roundRadius):
+			print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+			fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, (maximum - 1))
 	else:
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
