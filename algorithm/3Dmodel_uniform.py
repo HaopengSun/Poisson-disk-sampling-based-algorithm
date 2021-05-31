@@ -59,7 +59,7 @@ differences = []
 finers = []
 
 #users should input the parameters of the soil in the first place
-target_void_ratio = 5
+target_void_ratio = 0.8
 sieves = ['4.75-2.36', '2.36-1.18', '1.18-0.6', '0.6-0.3', '0.3-0.15']
 soil_distributions = [1, 0.92, 0.82, 0.58, 0.14]
 ideal_distributions = [0.08, 0.10, 0.24, 0.44, 0.14]
@@ -85,7 +85,9 @@ def main_program():
 	poisson(r)
 	# generate the remaining round of particles insertion
 	for i in range(len(sieves)):
-		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
+		if i > 0:
+			remove_cells(roundRadius[i])
+			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	# calculate the statistic results, the particle size distribution and the void ratio
 	list_particles()
 	# export CSV file which contains the positions and radii of particles
@@ -130,6 +132,7 @@ def setup_poisson():
 
 #generate points of Poisson Disk Sampling
 def point_poisson():
+	min_radius = roundRadius[0]
 	global occupation_poisson
 	while len(active) > 0:
 		check = np.random.randint(0, len(active))
@@ -147,7 +150,7 @@ def point_poisson():
 
 			if gcol > -1 and grow > -1 and gdepth > -1 and gcol < cols and grow < rows and gdepth < depths:
 				ok = True
-				#check distance between selected point and points in the around grids
+				# check distances between selected point and points in the around grids
 				nums = [-1, 0, 1]
 				num1s = [-1, 0, 1]
 				num2s = [-1, 0, 1]
@@ -175,8 +178,8 @@ def point_poisson():
 			pass
 		else:
 			#delete points which are too close to the border
-			if (grid[i][0] < width - 48) and (grid[i][0] > 48) and (grid[i][1] < height - 48) and (grid[i][1] > 48) and (grid[i][2] < depth - 48) and (grid[i][2] > 48):
-				Circles.append(Circle(grid[i][0], grid[i][1], grid[i][2], 48))
+			if (grid[i][0] < width - min_radius) and (grid[i][0] > min_radius) and (grid[i][1] < height - min_radius) and (grid[i][1] > min_radius) and (grid[i][2] < depth - min_radius) and (grid[i][2] > min_radius):
+				Circles.append(Circle(grid[i][0], grid[i][1], grid[i][2], min_radius))
 				occupation_poisson = occupation_poisson + 1
 	generateCircles_poisson(ranges[0], maximums[0])
 
@@ -240,17 +243,24 @@ def remove_particles(maximum_radius, minimum_radius):
 
 # adjust the volume to ensure it is within the acceptable scope using the minimum distance
 def poisson(r):
+	gradient = width / 100
 	setup_poisson()
 	if surpass_volume_poisson(1.02):
-		print('volume surpasses the target by more than 2%, the algorithm shrinks the radius')
+		print('volume surpasses the target by more than 2%, shrink the radius')
 		while surpass_volume_poisson(1.02) and stop_recursion():
 			adjust_radius(-1)
 		if not surpass_volume_poisson(1):
 			adjust_radius(1)
+		elif surpass_volume_poisson(1.2):
+			print('volume still surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius')
+			remove_particles(maximums[0], roundRadius[0])
+			if r + gradient < width:
+				r = r + gradient
+				poisson(r)
 	elif not surpass_volume_poisson(1):
-		print("volume does not reach the target")
+		print("volume does not reach the target, remove the particle and regenerate with a smaller minimum radius")
 		remove_particles(maximums[0], roundRadius[0])
-		r = r - 10
+		r = r - gradient
 		poisson(r)
 
 # omit cells which are fully covered by big spherical particles
@@ -304,7 +314,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	grid1 = list(range(0, gridnumbers1))
 
 	# eliminate the filly covered cells
-	remove_cells(roundRadius)
+	# remove_cells(roundRadius)
 
 	# conclude an array of the numbers of all non-filled cells
 	void_grid = []
@@ -339,8 +349,15 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	# if the function ends due to running out of all non-filled cells instead of reaching the target
 	# the function will rerun in an attemp to add more particles
 	if len(gridnum) == 0:
+		print('the volume does not reach the target')
 		print('void-filling round:', roundOfInfilling, ', insert:', occupation, 'particles, volume:', totalvolume, ', target volume:', ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
+	elif totalvolume > ideal_volume * 1.02:
+		surpass_percentage = (totalvolume - ideal_volume) / ideal_volume
+		print('volume surpass the target by more than 2% and the algorithm removes particles inserted and rerun with a shrunken radius', surpass_percentage)
+		remove_particles(maximum, roundRadius)
+		if (maximum > roundRadius):
+			fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, (maximum - 1))
 	else:
 		print('void-filling round:', roundOfInfilling, ', insert:', occupation, 'particles, volume:', totalvolume, ', target volume:', ideal_volume)
 
