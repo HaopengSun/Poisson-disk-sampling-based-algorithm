@@ -84,14 +84,14 @@ def main_program():
 	# the generation of the points with Poisson Disk Sampling distribution
 	poisson(r)
 	# generate the remaining round of particles insertion
-	for i in range(len(sieves)):
-		if i > 0:
-			remove_cells(roundRadius[i])
-			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
+	# for i in range(len(sieves)):
+	# 	if i > 0:
+	# 		remove_cells(roundRadius[i])
+	# 		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	# calculate the statistic results, the particle size distribution and the void ratio
 	list_particles()
 	# export CSV file which contains the positions and radii of particles
-	exportdata()
+	# exportdata()
 
 # 'Sphere' or 'Circle' object
 class Circle:
@@ -243,6 +243,7 @@ def remove_particles(maximum_radius, minimum_radius):
 
 # adjust the volume to ensure it is within the acceptable scope using the minimum distance
 def poisson(r):
+	print('minimum radius', r)
 	gradient = width / 100
 	setup_poisson()
 	if surpass_volume_poisson(1.02):
@@ -251,17 +252,17 @@ def poisson(r):
 			adjust_radius(-1)
 		if not surpass_volume_poisson(1):
 			adjust_radius(1)
-		elif surpass_volume_poisson(1.2):
-			print('volume still surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius')
-			remove_particles(maximums[0], roundRadius[0])
-			if r + gradient < width:
-				r = r + gradient
-				poisson(r)
 	elif not surpass_volume_poisson(1):
 		print("volume does not reach the target, remove the particle and regenerate with a smaller minimum radius")
 		remove_particles(maximums[0], roundRadius[0])
 		r = r - gradient
 		poisson(r)
+	# if surpass_volume_poisson(1.2):
+	# 	print('volume surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius')
+	# 	remove_particles(maximums[0], roundRadius[0])
+	# 	if r + gradient < width:
+	# 		r = r + gradient
+	# 		poisson(r)
 
 # omit cells which are fully covered by big spherical particles
 # they will not be checked by the next round of particle insertion
