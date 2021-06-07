@@ -11,7 +11,6 @@ width = int(input())
 print('Please enter canvas height (unit):')
 height = int(input())
 
-# 4.75, 2.36, 1.18, 0.6, 0.3
 print('Please enter sieve sizes (mm):')
 sieveSize = input().split(',')
 sieves = []
@@ -95,9 +94,6 @@ occupation8 = 0
 
 # users should input the parameters of the soil in the first place
 target_void_ratio = 0.8
-# sieves = ['4.75-2.36', '2.36-1.18', '1.18-0.6', '0.6-0.3', '0.3-0.15']
-# soil_distributions = [1, 0.92, 0.82, 0.58, 0.14]
-# ideal_distributions = [0.08, 0.10, 0.24, 0.44, 0.14]
 sieve_number = len(sieves)
 
 # density of Sand = 0.001631 g/mm³
@@ -428,25 +424,30 @@ def exportdata():
 			csv_writer.writerow([Circles[i].x, Circles[i].y, Circles[i].r])
 		print('export csv file')
 
+def filter_particles(maxi, mini = 0):
+	print(maxi, mini)
+	power2D = 2
+	volume = 0
+	for i in range(len(Circles)):
+		if mini <= Circles[i].r < maxi:
+			volume += pi * Circles[i].r ** power2D
+	return volume
+
 def list_particles():
 	global mass
 	for _ in range(sieve_number):
-		volumes.append(0)
 		real_volumes.append(0)
 
-	power2D = 2
-
-	for i in range(len(Circles)):
-		if Circles[i].r < 6:
-			volumes[0] += pi * Circles[i].r ** power2D
-		elif 6 <= Circles[i].r < 12:
-			volumes[1] += pi * Circles[i].r ** power2D
-		elif 12 <= Circles[i].r < 24:
-			volumes[2] += pi * Circles[i].r ** power2D
-		elif 24 <= Circles[i].r < 48:
-			volumes[3] += pi * Circles[i].r ** power2D
-		elif 48 <= Circles[i].r < 95:
-			volumes[4] += pi * Circles[i].r ** power2D
+	volumes_reverse = []
+	for i in range(len(maximums)):
+		if i == 0:
+			volume_sieve = filter_particles(maximums[i], roundRadius[i])
+		elif (i != len(maximums) - 1):
+			volume_sieve = filter_particles(roundRadius[i - 1], roundRadius[i])
+		else:
+			volume_sieve = filter_particles(roundRadius[i - 1])
+		volumes_reverse.append(volume_sieve)
+	volumes = volumes_reverse[::-1]
 
 	totalvolume = 0
 	real_totalvolume = 0
@@ -477,3 +478,6 @@ def list_particles():
 	print('void ratio:', voidratio,'totalmass:', totalmass, 'totalvolume', totalvolume)
 
 main_program()
+
+# 4.75, 2.36, 1.18, 0.6, 0.3
+# 1, 0.92, 0.82, 0.58, 0.14
