@@ -16,7 +16,7 @@ pi = 3.1415926
 # the minimum distance between points with Poisson Disk distribution
 # it is set as a quarter of the canvas length and then adjusted automatically to ensure the volume 
 # of particles with Poisson Disk distribution is within the acceptable range
-r = width / 4
+r = width / 2
 k = 30
 root = 2 ** 0.5
 w = r / root
@@ -84,14 +84,14 @@ def main_program():
 	# the generation of the points with Poisson Disk Sampling distribution
 	poisson(r)
 	# generate the remaining round of particles insertion
-	# for i in range(len(sieves)):
-	# 	if i > 0:
-	# 		remove_cells(roundRadius[i])
-	# 		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
+	for i in range(len(sieves)):
+		if i > 0:
+			remove_cells(roundRadius[i])
+			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	# calculate the statistic results, the particle size distribution and the void ratio
 	list_particles()
 	# export CSV file which contains the positions and radii of particles
-	# exportdata()
+	exportdata()
 
 # 'Sphere' or 'Circle' object
 class Circle:
@@ -246,7 +246,13 @@ def poisson(r):
 	print('minimum radius', r)
 	gradient = width / 100
 	setup_poisson()
-	if surpass_volume_poisson(1.02):
+	if surpass_volume_poisson(5):
+		print('volume surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius')
+		remove_particles(maximums[0], roundRadius[0])
+		if r + gradient < width:
+			r = r + gradient
+			poisson(r)
+	elif surpass_volume_poisson(2):
 		print('volume surpasses the target by more than 2%, shrink the radius')
 		while surpass_volume_poisson(1.02) and stop_recursion():
 			adjust_radius(-1)
@@ -257,12 +263,7 @@ def poisson(r):
 		remove_particles(maximums[0], roundRadius[0])
 		r = r - gradient
 		poisson(r)
-	# if surpass_volume_poisson(1.2):
-	# 	print('volume surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius')
-	# 	remove_particles(maximums[0], roundRadius[0])
-	# 	if r + gradient < width:
-	# 		r = r + gradient
-	# 		poisson(r)
+
 
 # omit cells which are fully covered by big spherical particles
 # they will not be checked by the next round of particle insertion
