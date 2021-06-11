@@ -1,5 +1,6 @@
 import random, math, csv, json
 import numpy as np
+import matplotlib.pyplot as plt
 
 # input the parameters
 print('Please enter unit size (mm/unit):')
@@ -34,7 +35,7 @@ for i in range(len(sieveSize)):
 	else:
 		maximums.append(r - 1)
 		roundRadius.append(r)
-print('Please enter minimum particle radius (unit) (should be an integer greater than 0 and smaller than'+ str(maximums[len(maximums)-1]) +'):')
+print('Please enter minimum particle radius (unit) (should be an integer greater than 0 and smaller than '+ str(maximums[len(maximums)-1]) +'):')
 minimum_radius = int(input())
 roundRadius.append(minimum_radius)
 print('maximum radius in every sieve:', maximums, 'minimum radius in every sieve:', roundRadius)
@@ -53,18 +54,33 @@ for i in range(len(finer_percent)):
 		ideal_distributions.append(finer)
 print('finer percent:', soil_distributions, 'percent passing for every sieve:', ideal_distributions)
 
+print('Please input the void ratio:')
+target_void_ratio = float(input())
+
+print('Please input the soil density (g/mm³):')
+density = float(input())
+
+print('Please enter the cell size (unit):')
+w1 = int(input())
+
+print('All parameters:')
+print('unit size', str(unit), 'canvas size:', str(width), 'x', str(height))
+print('maximum radius in every sieve:', maximums, 'minimum radius in every sieve:', roundRadius)
+print('finer percent:', soil_distributions, 'percent passing for every sieve:', ideal_distributions)
+print('void ratio:', str(target_void_ratio), 'soil density:', str(density), 'cell size:', str(w1), 'x',str(w1))
+print('whether all parameters are correct? (y/n)')
+correct = input()
+
 active = []
 pi = 3.1415926
 
 # the minimum distance between particles is initially set as the half of the canvas side length
 # and then the algorithm will adjust it to ensure the volume of particles in the first sieve is within the acceptable limit
-r = 400
+r = width / 2
 k = 30
 root = 2 ** 0.5
+# the cell size for generating particles of Poisson Disk distirbution
 w = r / root
-
-# divide the whole canvan with 5 * 5 grids, because it can locat the tiny voids to insert the smallest particles
-w1 = 5
 
 # only check the particles around the newly-inserted particle
 ranges = []
@@ -90,15 +106,8 @@ real_volumes = []
 masses = []
 differences = []
 finers = []
-occupation8 = 0
 
-# users should input the parameters of the soil in the first place
-target_void_ratio = 0.8
 sieve_number = len(sieves)
-
-# density of Sand = 0.001631 g/mm³
-# for mixture soil, the user can add variables for particles with different densities
-density = 0.001631
 
 volume = width * height
 ideal_totalmass = (volume / (target_void_ratio + 1))
@@ -425,7 +434,6 @@ def exportdata():
 		print('export csv file')
 
 def filter_particles(maxi, mini = 0):
-	print(maxi, mini)
 	power2D = 2
 	volume = 0
 	for i in range(len(Circles)):
@@ -474,10 +482,31 @@ def list_particles():
 	for i in range(len(masses)):
 		differences.append(masses[i] - ideal_masses[i])
 	for i in range(sieve_number):
-		print('sieve:', sieves[i], 'finer:', finers[i], 'ideal volumes:', ideal_volumes[i], 'volume:', volumes[i], 'ideal mass:', ideal_masses[i], 'mass:', masses[i], 'difference:', differences[i])
+		print('sieve:', sieves[i], 'finer:', finers[i], 'target volume:', ideal_volumes[i], 'model volume:', volumes[i], 'target mass:', ideal_masses[i], 'model mass:', masses[i], 'difference:', differences[i])
 	print('void ratio:', voidratio,'totalmass:', totalmass, 'totalvolume', totalvolume)
 
-main_program()
+	finers.append(0)
+	soil_distributions.append(0)
+	roundRadius.insert(0, maximums[0])
+
+	real_radius = []
+	for radius in roundRadius:
+		real_radius.append(radius * unit)
+	plt.title("Particle-size distribution")
+	plt.plot(real_radius, finers, linestyle = 'dashed', label='2D model')
+	plt.plot(real_radius, soil_distributions, linestyle = 'dotted', label='target soil data')
+	plt.xscale('log',base=10)
+	plt.xlabel("particle size")
+	plt.ylabel("finer percent")
+	plt.legend()
+	plt.show()
+	print(finers, soil_distributions, roundRadius)
+
+if correct == 'y':
+	main_program()
+else:
+	print('Exit')
 
 # 4.75, 2.36, 1.18, 0.6, 0.3
 # 1, 0.92, 0.82, 0.58, 0.14
+# density = 0.001631 void ratio = 0.8
