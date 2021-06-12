@@ -125,8 +125,8 @@ def main_program():
 	for i in range(len(sieves)):
 		if i != 0:
 			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
-	list_particles()
 	exportdata()
+	list_particles()
 
 class Circle:
 	def __init__(self, x, y, r):
@@ -262,9 +262,26 @@ def adjust_radius(addminus):
 			Circles[i].r += addminus
 
 def remove_particles(maximum_radius, minimum_radius):
+	remove_particle = []
 	for circle in Circles:
-		if circle.r >= minimum_radius and circle.r < maximum_radius:
-			Circles.remove(circle)
+		if circle.r >= minimum_radius and circle.r <= maximum_radius:
+			remove_particle.append(circle)
+	for circle in remove_particle:
+		Circles.remove(circle)
+
+def particles_mini(maximum_radius, minimum_radius):
+	for circle in Circles:
+		if circle.r >= minimum_radius and circle.r <= maximum_radius:
+			if circle.r != minimum_radius:
+				return False
+	return True
+
+def particles_total_volume(maximum_radius, minimum_radius):
+	volume = 0
+	for circle in Circles:
+		if minimum_radius <= circle.r and circle.r < maximum_radius:
+			volume += pi * circle.r ** 2
+	return volume
 
 # adjust the volume to ensure it is within the acceptable scope
 def poisson(r):
@@ -275,7 +292,6 @@ def poisson(r):
 		if not surpass_volume_poisson(1):
 			adjust_radius(1)
 	elif not surpass_volume_poisson(1):
-		# print("does not reach the target")
 		remove_particles(maximums[0], roundRadius[0])
 		r = r - 10
 		poisson(r)
@@ -314,13 +330,15 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	if len(gridnum) == 0:
 		print('all non-filled cells checked', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
-	elif totalvolume > ideal_volume * 1.02:
-		remove_particles(maximum, roundRadius)
-		if (maximum > roundRadius):
-			print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
-			fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, (maximum - 1))
-	else:
-		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+
+	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not particles_mini(maximums[roundOfInfilling], roundRadius))
+	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not particles_mini(maximums[roundOfInfilling], roundRadius):
+		maximum -= 1
+		remove_particles(maximums[roundOfInfilling], roundRadius)
+		print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+		fill_the_void(roundOfInfilling, 0, 0, ideal_volume, roundRadius, rangeRadius, maximum)
+	
+	print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
 def radii(q, initial_radius, range1, maximum1):
 
@@ -408,6 +426,7 @@ def single_radius(q, initial_radius, range1, maximum1):
     #generate particles
 	if valid is True:
 		Circles.append(Circle(x, y, maximum1))
+		return maximum1
 	else:
 		return 0
 
@@ -482,7 +501,7 @@ def list_particles():
 	for i in range(len(masses)):
 		differences.append(masses[i] - ideal_masses[i])
 	for i in range(sieve_number):
-		print('sieve:', sieves[i], 'finer:', finers[i], 'target volume:', ideal_volumes[i], 'model volume:', volumes[i], 'target mass:', ideal_masses[i], 'model mass:', masses[i], 'difference:', differences[i])
+		print('sieve size (mm):', sieves[i], 'target finer', soil_distributions[i], 'finer:', finers[i], 'target volume:', ideal_volumes[i], 'model volume:', volumes[i], 'target mass:', ideal_masses[i], 'model mass:', masses[i], 'difference:', differences[i])
 	print('void ratio:', voidratio,'totalmass:', totalmass, 'totalvolume', totalvolume)
 
 	finers.append(0)
@@ -507,6 +526,14 @@ if correct == 'y':
 else:
 	print('Exit')
 
+# uniformly graded soil
 # 4.75, 2.36, 1.18, 0.6, 0.3
 # 1, 0.92, 0.82, 0.58, 0.14
 # density = 0.001631 void ratio = 0.8
+
+# pure sand
+# unit 0.0125 height/width 1000 
+# 4.75, 2.36, 1.7, 0.6, 0.4, 0.3, 0.15, 0.075
+# 2
+# 1, 0.76, 0.7, 0.47, 0.29, 0.18, 0.05, 0.02
+# void ratio = 0.6
