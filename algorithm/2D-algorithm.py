@@ -35,7 +35,7 @@ for i in range(len(sieveSize)):
 	else:
 		maximums.append(r - 1)
 		roundRadius.append(r)
-print('Please enter minimum particle radius (unit) (should be an integer greater than 0 and smaller than '+ str(maximums[len(maximums)-1]) +'):')
+print('Please enter minimum particle radius (unit) (should be an integer greater than 0 and smaller than or equal to '+ str(maximums[len(maximums)-1]) +'):')
 minimum_radius = int(input())
 roundRadius.append(minimum_radius)
 print('maximum radius in every sieve:', maximums, 'minimum radius in every sieve:', roundRadius)
@@ -335,14 +335,6 @@ def remove_cells(roundRadius):
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
 	grid1 = list(range(0, gridnumbers1))
-
-	# for i in range(len(Circles)):
-	# 	col_sub = math.floor(Circles[i].x / w1)
-	# 	row_sub = math.floor(Circles[i].y / w1)
-	# 	numb = col_sub + row_sub * cols1
-	# 	grid1[numb] = 1
-	# 	gridnum.remove(numb)
-
 	remove_cells(roundRadius)
 
 	void_grid = []
@@ -457,7 +449,7 @@ def single_radius(q, initial_radius, range1, maximum1):
 	min_boundary = [x, y, (width - x), (height - y)]
 	min_b = np.amin(min_boundary)
 	if min_b < m:
-		valid = None
+		valid = False
 
     #in the reseaching sphere area with 'mindis' radius
 	min_around = []
@@ -466,7 +458,7 @@ def single_radius(q, initial_radius, range1, maximum1):
 			if ((x - range1) < Circles[j].x < (x + range1)) or ((y - range1) < Circles[j].y < (y + range1)):
 				k = dist(x, y, Circles[j].x, Circles[j].y) - Circles[j].r
 				if (k <  m):
-					valid = None
+					valid = False
 					break
 
     #generate particles
