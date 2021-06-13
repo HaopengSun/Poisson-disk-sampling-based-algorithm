@@ -11,7 +11,7 @@ Robert Bridson. 2007. “Fast Poisson Disk Sampling in Arbitrary Dimensions”, 
 ## Voids infilling by Grid Sampling
 
 ## users can input parameters in the terminal to run the algorithm
-run 2D-algorithm.py and input parameters based on instructions
+run 2D-algorithm.py/3D-algorithm.py and input parameters based on instructions
 
 ## 2D model visualization
 
