@@ -1,5 +1,4 @@
 import './App.css';
-import TodoList from './components/TodoList'
 import Poisson from './components/Poisson';
 import {
   BrowserRouter as Router,
@@ -20,10 +19,7 @@ function App() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <LinkContainer to="/">
-                <Nav.Link>Poisson</Nav.Link>
-              </LinkContainer>
-              <LinkContainer to="/todo">
-                <Nav.Link>TodoList</Nav.Link>
+                <Nav.Link>Poisson List</Nav.Link>
               </LinkContainer>
             </Nav>
           </Navbar.Collapse>
@@ -31,9 +27,6 @@ function App() {
       </Navbar>
 
       <Switch>
-          <Route path="/todo">
-            <TodoList />
-          </Route>
           <Route path="/">
             <Poisson />
           </Route>
