@@ -3,14 +3,14 @@ import React, { useState } from "react";
 const InputForm = function(props){
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [unitsize, setUnitsize] = useState(null)
-  const [width, setWidth] = useState(null)
-  const [height, setHeight] = useState(null)
+  const [unitsize, setUnitsize] = useState(undefined)
+  const [width, setWidth] = useState(undefined)
+  const [height, setHeight] = useState(undefined)
   const [sievesize, setSievesize] = useState('')
-  const [minimumradius, setMinimumradius] = useState(null)
-  const [voidratio, setVoidratio] = useState(null)
-  const [cellsize, setCellsize] = useState(null)
-  const [density, setDensity] = useState(null)
+  const [minimumradius, setMinimumradius] = useState(undefined)
+  const [voidratio, setVoidratio] = useState(undefined)
+  const [cellsize, setCellsize] = useState(undefined)
+  const [density, setDensity] = useState(undefined)
   const defaultParameter = props.defaultParameter
 
   const submitName = function(){
