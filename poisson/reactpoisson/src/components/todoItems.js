@@ -1,3 +1,4 @@
+// temporaily used obj without the connection with backend using axios
 const todoItems = [
     {
       id: 1,
