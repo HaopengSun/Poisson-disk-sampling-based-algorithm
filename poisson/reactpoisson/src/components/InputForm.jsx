@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 
-const InputForm = function(){
+const InputForm = function(props){
+    const [name, setName] = useState('')
+    const defaultParameter = props.defaultParameter
+
+    const submitName = function(){
+        props.setParameter({...defaultParameter, name})
+    }
 
     return(
-        <form>
+        <form className='inputform' onSubmit={(event) => {
+            event.preventDefault();
+            submitName()
+        }}>
             <label>
-                Name:
-                <input type="text" name="name" />
+                Name:<input className='formlabel' type="text" name="name" value={name} onChange={(event) => setName(event.target.value)}/>
             </label>
-            <input type="submit" value="Submit" />
+            <input className="btn btn-light formlabel" type="submit" value="Submit" />
         </form>
     )
 }
