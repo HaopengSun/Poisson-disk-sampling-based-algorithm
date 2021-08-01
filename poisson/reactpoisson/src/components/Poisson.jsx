@@ -23,6 +23,10 @@ const Poisson = function(){
   const createItem = function(){
     setShowForm(!showForm)
   }
+
+  const clearItem = function(){
+    setParameter(defaultParameter)
+  }
   
   return(
     <div className='poisson'>
@@ -31,9 +35,14 @@ const Poisson = function(){
         unitsize, canvas size, sieve size, minimum radius, finer percent, void ratio, cell size, soil density.
       </h5>
       <h5>parameter obj: {JSON.stringify(parameter, null, 2)}</h5>
-      <button className="btn btn-light" onClick={() => createItem()}>
-        Set Parameters
-      </button>
+      <div>
+        <button className="btn btn-light homebutton" onClick={() => createItem()}>
+          Set Parameters
+        </button>
+        <button className="btn btn-light homebutton" onClick={() => clearItem()}>
+          Clear Parameters
+        </button>
+      </div>
       {showForm && <InputForm setParameter={setParameter} defaultParameter={defaultParameter}/>}
     </div>
   )

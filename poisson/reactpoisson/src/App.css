@@ -1,11 +1,23 @@
 .poisson{
-  margin: 3em;
+  margin: 1em 3em;
 }
 
 .inputform{
   margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .formlabel{
   margin-left: 1em;
+  margin-right: 1em;
+}
+
+.homebutton{
+  margin: 1em;
+}
+
+.subinput{
+  display: flex;
 }
