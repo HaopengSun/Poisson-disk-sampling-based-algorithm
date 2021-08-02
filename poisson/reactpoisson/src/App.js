@@ -1,6 +1,7 @@
 import './App.css';
 import Poisson from './components/Poisson';
-import About from './components/About'
+import About from './components/About';
+import History from './components/History';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap'
@@ -21,6 +22,9 @@ function App() {
               <LinkContainer to="/about">
                 <Nav.Link>About</Nav.Link>
               </LinkContainer>
+              <LinkContainer to="/history">
+                <Nav.Link>History</Nav.Link>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -32,6 +36,9 @@ function App() {
           </Route>
           <Route path="/about">
             <About />
+          </Route>
+          <Route path="/history">
+            <History />
           </Route>
         </Switch>
     </Router>
