@@ -25,3 +25,8 @@
 .about{
   margin: 1em 3em;
 }
+
+.inputformbutton{
+  display: flex;
+  margin: 1em;
+}

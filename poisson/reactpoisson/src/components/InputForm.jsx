@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios'
 
 const InputForm = function(props){
   const [title, setTitle] = useState('')
@@ -11,14 +12,41 @@ const InputForm = function(props){
   const [voidratio, setVoidratio] = useState(undefined)
   const [cellsize, setCellsize] = useState(undefined)
   const [density, setDensity] = useState(undefined)
+  const [id, setId] = useState(0)
+  const [finerpercent, setFinerpercent] = useState('')
   const defaultParameter = props.defaultParameter
 
+  useEffect(() => {
+    axios.get('/api/algorithms/')
+    .then(function (response) {
+      setId(response.data.length + 1);
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  }, [])
+
   const submitName = function(){
-    props.setParameter({...defaultParameter, title, description, unitsize, width, height, sievesize, cellsize, density, voidratio})
+    props.setParameter({...defaultParameter, finerpercent, title, description, unitsize, width, height, sievesize, cellsize, density, voidratio, id})
+  }
+
+  const onReset = function(){
+    setTitle('')
+    setDescription('')
+    setUnitsize(0)
+    setWidth(0)
+    setHeight(0)
+    setSievesize('')
+    setMinimumradius(0)
+    setVoidratio(0)
+    setCellsize(0)
+    setDensity(0)
+    setFinerpercent('')
   }
 
   return(
-    <form className='inputform' onSubmit={(event) => {
+    <>
+    <form className='inputform' id="input" onSubmit={(event) => {
       event.preventDefault();
       submitName()
     }}>
@@ -57,6 +85,10 @@ const InputForm = function(props){
           value={minimumradius} onChange={(event) => setMinimumradius(event.target.value)}/>
         </label>
       </div>
+      <label>
+          Finer percent: <input className='formlabel' type="text" name="finerpercent"
+          value={finerpercent} onChange={(event) => setFinerpercent(event.target.value)}/>
+      </label>
       <div className='subinput'>
         <label>
           void ratio: <input className='formlabel' type="number" name="voidratio"  step="0.01"
@@ -71,8 +103,12 @@ const InputForm = function(props){
           value={density} onChange={(event) => setDensity(event.target.value)}/>
         </label>
       </div>
-      <input className="btn btn-light formlabel" type="submit" value="Submit" />
     </form>
+    <div className="inputformbutton">
+      <input className="btn btn-light formlabel" type="submit" value="Submit" />
+      <input className="btn btn-light formlabel" onClick={() => onReset()} type="button" value="Reset" />
+    </div>
+    </>
   )
 }
 

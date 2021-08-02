@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputForm from './InputForm'
+import axios from 'axios'
 
 const Poisson = function(){
   const [showForm, setShowForm] = useState(false)
