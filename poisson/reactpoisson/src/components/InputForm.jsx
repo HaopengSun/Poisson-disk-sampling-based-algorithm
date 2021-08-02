@@ -52,6 +52,7 @@ const InputForm = function(props){
     <form className='inputform' id="input" onSubmit={(event) => {
       event.preventDefault();
       submitParameter();
+      props.createItem()
     }}>
       <div className='subinput'>
         <label>

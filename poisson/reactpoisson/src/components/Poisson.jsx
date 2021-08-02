@@ -34,7 +34,6 @@ const Poisson = function(){
       <h5> Basic parameters that the algorithm requires to input have title, description, 
         unitsize, canvas size, sieve size, minimum radius, finer percent, void ratio, cell size, soil density.
       </h5>
-      <h5>parameter obj: {JSON.stringify(parameter, null, 2)}</h5>
       <div>
         <button className="btn btn-light homebutton" onClick={() => createItem()}>
           Set Parameters
@@ -43,7 +42,8 @@ const Poisson = function(){
           Clear Parameters
         </button>
       </div>
-      {showForm && <InputForm setParameter={setParameter} defaultParameter={defaultParameter} />}
+      {showForm && <InputForm setParameter={setParameter} defaultParameter={defaultParameter} createItem={createItem}/>}
+      {!showForm && <h5>submit parameter obj: {JSON.stringify(parameter, null, 2)}</h5>}
     </div>
   )
 }
