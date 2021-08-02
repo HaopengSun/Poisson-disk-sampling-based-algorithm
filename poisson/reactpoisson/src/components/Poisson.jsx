@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import InputForm from './InputForm'
-import axios from 'axios'
 
 const Poisson = function(){
   const [showForm, setShowForm] = useState(false)
@@ -44,7 +43,7 @@ const Poisson = function(){
           Clear Parameters
         </button>
       </div>
-      {showForm && <InputForm setParameter={setParameter} defaultParameter={defaultParameter}/>}
+      {showForm && <InputForm setParameter={setParameter} defaultParameter={defaultParameter} />}
     </div>
   )
 }

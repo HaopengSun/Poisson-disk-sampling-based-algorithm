@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios'
+import poseParameter from '../helper/poseData'
 
 const InputForm = function(props){
   const [title, setTitle] = useState('')
@@ -26,8 +27,10 @@ const InputForm = function(props){
     })
   }, [])
 
-  const submitName = function(){
-    props.setParameter({...defaultParameter, finerpercent, title, description, unitsize, width, height, sievesize, cellsize, density, voidratio, id})
+  const submitParameter = function(){
+    const newParameter = {...defaultParameter, finerpercent, title, description, unitsize, width, height, sievesize, cellsize, density, voidratio, id}
+    props.setParameter(newParameter)
+    poseParameter(newParameter)
   }
 
   const onReset = function(){
@@ -48,7 +51,7 @@ const InputForm = function(props){
     <>
     <form className='inputform' id="input" onSubmit={(event) => {
       event.preventDefault();
-      submitName()
+      submitParameter();
     }}>
       <div className='subinput'>
         <label>
@@ -103,11 +106,11 @@ const InputForm = function(props){
           value={density} onChange={(event) => setDensity(event.target.value)}/>
         </label>
       </div>
+      <div className="inputformbutton">
+        <input className="btn btn-light formlabel" type="submit" value="Submit" />
+        <input className="btn btn-light formlabel" onClick={() => onReset()} type="button" value="Reset" />
+      </div>
     </form>
-    <div className="inputformbutton">
-      <input className="btn btn-light formlabel" type="submit" value="Submit" />
-      <input className="btn btn-light formlabel" onClick={() => onReset()} type="button" value="Reset" />
-    </div>
     </>
   )
 }
