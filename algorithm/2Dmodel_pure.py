@@ -10,6 +10,7 @@ import _remove_grid
 import _adjustment
 import _mini_radius
 import _plot
+import _particle_filter
 
 # set unit size and canvas size
 unit = 0.0125
@@ -232,29 +233,8 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 
 def list_particles():
 	global mass
-	for _ in range(sieve_number):
-		volumes.append(0)
-		real_volumes.append(0)
 
-	power2D = 2
-
-	for i in range(len(Circles)):
-		if Circles[i].r < 3:
-			volumes[0] += pi * Circles[i].r ** power2D
-		elif 3 <= Circles[i].r < 6:
-			volumes[1] += pi * Circles[i].r ** power2D
-		elif 6 <= Circles[i].r < 12:
-			volumes[2] += pi * Circles[i].r ** power2D
-		elif 12 <= Circles[i].r < 16:
-			volumes[3] += pi * Circles[i].r ** power2D
-		elif 16 <= Circles[i].r < 24:
-			volumes[4] += pi * Circles[i].r ** power2D
-		elif 24 <= Circles[i].r < 68:
-			volumes[5] += pi * Circles[i].r ** power2D
-		elif 68 <= Circles[i].r < 95:
-			volumes[6] += pi * Circles[i].r ** power2D
-		elif 95 <= Circles[i].r < 190:
-			volumes[7] += pi * Circles[i].r ** power2D
+	volumes = _particle_filter.particleSieve(Circles, sieve_number, real_volumes, maximums, roundRadius)
 
 	totalvolume = 0
 	real_totalvolume = 0
