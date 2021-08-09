@@ -7,6 +7,7 @@ import _exportdata
 import _radii
 import _single_radius
 import _remove_grid
+import _adjustment
 
 # set unit size and canvas size
 unit = 0.0125
@@ -176,47 +177,16 @@ def generateCircles_p(mindis, maxi):
 			Circles[i].grow()
 
 
-# check whether the volume of particles of Poisson Disk distirbution surpasses the target by 2% or reaches the target
-def surpass_volume_poisson(multiplication):
-	volume_poisson = 0
-	for i in range(len(Circles)):
-		volume_poisson += pi * Circles[i].r ** 2
-	print('volume of Poisson Disk particles', volume_poisson, 'target volume',ideal_volumes[0])
-	if volume_poisson > (ideal_volumes[0] * multiplication):
-		return True
-	return False
-
-# the radii of particles with Poisson Disk distribution are equal of the minimum value in the radius range of the largest sieve
-def stop_recursion():
-	for i in range(len(Circles)):
-		if Circles[i].r > roundRadius[0]:
-			return True
-	return False
-
-# adjust the volume by adding or minusing the radius by one unit
-def adjust_radius(addminus):
-	for i in range(len(Circles)):
-		if Circles[i].r > roundRadius[0]:
-			Circles[i].r += addminus
-
-def remove_particles(maximum_radius, minimum_radius):
-	remove_particle = []
-	for circle in Circles:
-		if circle.r >= minimum_radius and circle.r <= maximum_radius:
-			remove_particle.append(circle)
-	for circle in remove_particle:
-		Circles.remove(circle)
-
 # adjust the volume to ensure it is within the acceptable scope
 def poisson(r):
 	setup_poisson(gridnumbers, cols, rows)
-	if surpass_volume_poisson(1.02):
-		while surpass_volume_poisson(1.02) and stop_recursion():
-			adjust_radius(-1)
-		if not surpass_volume_poisson(1):
-			adjust_radius(1)
-	elif not surpass_volume_poisson(1):
-		remove_particles(maximums[0], roundRadius[0])
+	if _adjustment.surpass_volume_poisson(1.02, Circles, ideal_volumes):
+		while _adjustment.surpass_volume_poisson(1.02, Circles, ideal_volumes) and _adjustment.stop_recursion(Circles, roundRadius):
+			_adjustment.adjust_radius(-1, Circles, roundRadius)
+		if not _adjustment.surpass_volume_poisson(1, Circles, ideal_volumes):
+			_adjustment.adjust_radius(1, Circles, roundRadius)
+	elif not _adjustment.surpass_volume_poisson(1, Circles, ideal_volumes):
+		_adjustment.remove_particles(maximums[0], roundRadius[0], Circles)
 		r = r - 10
 		poisson(r)
 
@@ -258,7 +228,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not particles_mini(maximums[roundOfInfilling], roundRadius))
 	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not particles_mini(maximums[roundOfInfilling], roundRadius):
 		maximum -= 1
-		remove_particles(maximums[roundOfInfilling], roundRadius)
+		_adjustment.remove_particles(maximums[roundOfInfilling], roundRadius, Circles)
 		print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, 0, 0, ideal_volume, roundRadius, rangeRadius, maximum)
 	
