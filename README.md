@@ -8,14 +8,12 @@ the particle size distribution and the void ratio.
 The process of point creation in this section is similar to the method proposed by Bridson (2007).
 Robert Bridson. 2007. “Fast Poisson Disk Sampling in Arbitrary Dimensions”, ACM SIGGRAPH 2007 sketches, Pages 22-es
 
-## Voids infilling by Grid Sampling
+Algorithms can be found in folder '/algorithm'
 
-## users can input parameters in the terminal to run the algorithm
-run 2D-algorithm.py/3D-algorithm.py and input parameters based on instructions
+## Model visualization
 
-## 2D model visualization
-
-P5.js is introduced to realize DEM model visualization
+P5.js (https://p5js.org/) is introduced to realize DEM 2D model visualization
+ParaView (https://www.paraview.org/) is used to realize 3D model visualization
 
 ## Yade deposition model
 
