@@ -8,6 +8,7 @@ import _radii
 import _single_radius
 import _remove_grid
 import _adjustment
+import _mini_radius
 
 # set unit size and canvas size
 unit = 0.0125
@@ -190,13 +191,6 @@ def poisson(r):
 		r = r - 10
 		poisson(r)
 
-def particles_mini(maximum_radius, minimum_radius):
-	for circle in Circles:
-		if circle.r >= minimum_radius and circle.r <= maximum_radius:
-			if circle.r != minimum_radius:
-				return False
-	return True
-
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
 	gridnum = list(range(0, gridnumbers1))
@@ -225,8 +219,8 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
 
-	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not particles_mini(maximums[roundOfInfilling], roundRadius))
-	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not particles_mini(maximums[roundOfInfilling], roundRadius):
+	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles))
+	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles):
 		maximum -= 1
 		_adjustment.remove_particles(maximums[roundOfInfilling], roundRadius, Circles)
 		print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
