@@ -4,21 +4,21 @@ import _distance2d
 import _random_vector_function
 import _Circle
 
-unit = 0.05
-width = 800
-height = 800
+unit = 0.0125
+width = 1000
+height = 1000
 active = []
 pi = 3.1415926
 
-r = 400
+r = width / 2
 k = 30
 root = 2 ** 0.5
 w = r / root
 
-w1 = 10
+w1 = 5
 
-maximums = [95, 47, 23, 11, 5]
-roundRadius = [48, 24, 12, 6, 2]
+maximums = [190, 94, 67, 23, 15,  11, 5, 3, 2]
+roundRadius = [95, 68, 24, 16, 12, 6, 3, 2]
 
 ranges = []
 for maximum in maximums:
@@ -46,13 +46,12 @@ finers = []
 occupation8 = 0
 
 #users should input the parameters of the soil in the first place
-target_void_ratio = 0.8
-sieves = ['4.75-2.36', '2.36-1.18', '1.18-0.6', '0.6-0.3', '0.3-0.15']
-soil_distributions = [1, 0.92, 0.82, 0.58, 0.14]
-ideal_distributions = [0.08, 0.10, 0.24, 0.44, 0.14]
+target_void_ratio = 0.6
+sieves = ['4.75-2.36', '2.36-1.7', '1.7-0.6', '0.6-0.4', '0.4-0.3', '0.3-0.15', '0.15-0.075', '<0.074']
+soil_distributions = [1, 0.76, 0.7, 0.47, 0.29, 0.18, 0.05, 0.02]
+ideal_distributions = [0.24, 0.06, 0.23, 0.18, 0.11, 0.13, 0.03, 0.02]
 sieve_number = len(sieves)
 
-# density of  Sand = 0.001631 g/mm³
 density = 0.001631
 
 volume = width * height
@@ -67,13 +66,14 @@ for ideal_distribution in ideal_distributions:
 	ideal_masses.append(ideal_mass)
 
 def main_program():
-	setup(gridnumbers, cols, rows)
+	poisson(r)
 	for i in range(len(sieves)):
-		fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
+		if i > 0:
+			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	list_particles()
-	exportdata()
+	# exportdata()
 
-def setup(gridnumbers, cols, rows):
+def setup_poisson(gridnumbers, cols, rows):
 	for i in range(gridnumbers):
 		grid.append(None)
 
@@ -87,10 +87,10 @@ def setup(gridnumbers, cols, rows):
 	gridy = math.floor(randomy / w)
 	grid[gridx + gridy * cols] = randompoint
 	active.append(randompoint)
-	poisson()
+	point_poisson()
 
 #generate points of Poisson Disk Sampling
-def poisson():
+def point_poisson():
 
 	global occupation_poisson
 
@@ -138,7 +138,7 @@ def poisson():
 				Circles.append(_Circle.Circle(grid[i][0], grid[i][1], roundRadius[0], width, height))
 				occupation_poisson = occupation_poisson + 1
 
-	generateCircles_p(ranges[0], maximums[0])
+	generateCircles_p(ranges[0], (maximums[0] - 2))
 
 	print('poisson disk sampling', occupation_poisson)
 
@@ -168,9 +168,93 @@ def generateCircles_p(mindis, maxi):
 								break
 			Circles[i].grow()
 
+
+# check whether the volume of particles of Poisson Disk distirbution surpasses the target by 2% or reaches the target
+def surpass_volume_poisson(multiplication):
+	volume_poisson = 0
+	for i in range(len(Circles)):
+		volume_poisson += pi * Circles[i].r ** 2
+	print('volume of Poisson Disk particles', volume_poisson, 'target volume',ideal_volumes[0])
+	if volume_poisson > (ideal_volumes[0] * multiplication):
+		return True
+	return False
+
+# the radii of particles with Poisson Disk distribution are equal of the minimum value in the radius range of the largest sieve
+def stop_recursion():
+	for i in range(len(Circles)):
+		if Circles[i].r > roundRadius[0]:
+			return True
+	return False
+
+# adjust the volume by adding or minusing the radius by one unit
+def adjust_radius(addminus):
+	for i in range(len(Circles)):
+		if Circles[i].r > roundRadius[0]:
+			Circles[i].r += addminus
+
+def remove_particles(maximum_radius, minimum_radius):
+	remove_particle = []
+	for circle in Circles:
+		if circle.r >= minimum_radius and circle.r <= maximum_radius:
+			remove_particle.append(circle)
+	for circle in remove_particle:
+		Circles.remove(circle)
+
+# adjust the volume to ensure it is within the acceptable scope
+def poisson(r):
+	setup_poisson(gridnumbers, cols, rows)
+	if surpass_volume_poisson(1.02):
+		while surpass_volume_poisson(1.02) and stop_recursion():
+			adjust_radius(-1)
+		if not surpass_volume_poisson(1):
+			adjust_radius(1)
+	elif not surpass_volume_poisson(1):
+		remove_particles(maximums[0], roundRadius[0])
+		r = r - 10
+		poisson(r)
+
+
+# omit cells which are fully covered by big spherical particles
+# they will not be checked by the next round of particle insertion
+def remove_cells(roundRadius):
+	for i in range(len(Circles)):
+		col_sub = math.floor(Circles[i].x / w1)
+		row_sub = math.floor(Circles[i].y / w1)
+		if Circles[i].r > w1:
+			range_circles = math.ceil((Circles[i].r + 2) / w1)
+			nums = list(range(-range_circles, range_circles + 1))
+			num1s = list(range(-range_circles, range_circles + 1))
+			for num in nums:
+				for num1 in num1s:
+					if 0 <= col_sub + num1 < cols1 and 0 <= row_sub + num < rows1:
+						index = (col_sub + num1) + (row_sub + num) * cols1
+						y_grid = math.floor(index / cols1)
+						x_grid = math.floor(index - y_grid * cols1)
+						y1 = y_grid * w1
+						x1 = x_grid * w1 
+						# distances of the eight corners of the cell and the particle center
+						d1 = _distance2d.dist(x1, y1, Circles[i].x, Circles[i].y)
+						d2 = _distance2d.dist((x1 + w1), y1, Circles[i].x, Circles[i].y)
+						d3 = _distance2d.dist(x1, (y1 + w1), Circles[i].x, Circles[i].y)
+						d4 = _distance2d.dist((x1 + w1), (y1 + w1), Circles[i].x, Circles[i].y)
+						distance_around = [d1, d2, d3, d4]
+						distance_around.sort()
+						distance_max = distance_around[2]
+						# if the maximum distance is smaller than the particle radius plus the minimun value of the radius range for the next round
+						# mark this cell as minus one
+						if distance_max <= Circles[i].r + roundRadius:
+							grid1[index] = -1
+		else:
+			# if the particle radius is smaller than the cell size, this cell will be marked as occupied directly
+			index = col_sub + row_sub * cols1
+			grid1[index] = -1
+	print("filter the non-filled cells")
+
+
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
 	gridnum = list(range(0, gridnumbers1))
+	remove_cells(roundRadius)
 
 	for i in range(len(Circles)):
 		col_sub = math.floor(Circles[i].x / w1)
@@ -306,16 +390,22 @@ def list_particles():
 	power2D = 2
 
 	for i in range(len(Circles)):
-		if Circles[i].r < 6:
+		if Circles[i].r < 3:
 			volumes[0] += pi * Circles[i].r ** power2D
-		elif 6 <= Circles[i].r < 12:
+		elif 3 <= Circles[i].r < 6:
 			volumes[1] += pi * Circles[i].r ** power2D
-		elif 12 <= Circles[i].r < 24:
+		elif 6 <= Circles[i].r < 12:
 			volumes[2] += pi * Circles[i].r ** power2D
-		elif 24 <= Circles[i].r < 48:
+		elif 12 <= Circles[i].r < 16:
 			volumes[3] += pi * Circles[i].r ** power2D
-		elif 48 <= Circles[i].r < 95:
+		elif 16 <= Circles[i].r < 24:
 			volumes[4] += pi * Circles[i].r ** power2D
+		elif 24 <= Circles[i].r < 68:
+			volumes[5] += pi * Circles[i].r ** power2D
+		elif 68 <= Circles[i].r < 95:
+			volumes[6] += pi * Circles[i].r ** power2D
+		elif 95 <= Circles[i].r < 190:
+			volumes[7] += pi * Circles[i].r ** power2D
 
 	totalvolume = 0
 	real_totalvolume = 0
