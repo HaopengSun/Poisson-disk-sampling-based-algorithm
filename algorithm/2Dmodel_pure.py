@@ -15,7 +15,7 @@ k = 30
 root = 2 ** 0.5
 w = r / root
 
-w1 = 5
+w1 = 4
 
 maximums = [190, 94, 67, 23, 15,  11, 5, 3, 2]
 roundRadius = [95, 68, 24, 16, 12, 6, 3, 2]
@@ -43,7 +43,6 @@ real_volumes = []
 masses = []
 differences = []
 finers = []
-occupation8 = 0
 
 #users should input the parameters of the soil in the first place
 target_void_ratio = 0.6
@@ -250,6 +249,12 @@ def remove_cells(roundRadius):
 			grid1[index] = -1
 	print("filter the non-filled cells")
 
+def particles_mini(maximum_radius, minimum_radius):
+	for circle in Circles:
+		if circle.r >= minimum_radius and circle.r <= maximum_radius:
+			if circle.r != minimum_radius:
+				return False
+	return True
 
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
@@ -285,8 +290,15 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	if len(gridnum) == 0:
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
-	else:
-		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+
+	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not particles_mini(maximums[roundOfInfilling], roundRadius))
+	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not particles_mini(maximums[roundOfInfilling], roundRadius):
+		maximum -= 1
+		remove_particles(maximums[roundOfInfilling], roundRadius)
+		print('volume surpasses the target by 2%', 'round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
+		fill_the_void(roundOfInfilling, 0, 0, ideal_volume, roundRadius, rangeRadius, maximum)
+	
+	print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
 def radii(q, initial_radius, range1, maximum1):
 
@@ -319,7 +331,12 @@ def radii(q, initial_radius, range1, maximum1):
 
     #generate particles
 	if valid is True:
-		min_a = np.amin(min_around)
+
+		if not min_around:
+			min_a = 0
+		else:
+			min_a = np.amin(min_around)
+
 		if min_a <= min_b:
 			if min_a <= maximum1:
 				Circles.append(_Circle.Circle(x, y, min_a, width, height))
