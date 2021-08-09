@@ -11,6 +11,7 @@ import _adjustment
 import _mini_radius
 import _plot
 import _particle_filter
+import _print_result
 
 # set unit size and canvas size
 unit = 0.0125
@@ -52,8 +53,6 @@ gridnumbers1 = cols1 * rows1
 grid1 = np.zeros(gridnumbers1)
 volumes = []
 real_volumes = []
-masses = []
-differences = []
 finers = []
 
 #users should input the parameters of the soil in the first place
@@ -256,15 +255,9 @@ def list_particles():
 	volumes.reverse()
 	real_volumes.reverse()
 
-	for volume in real_volumes:
-		masses.append(volume * density)
-	for i in range(len(masses)):
-		differences.append(masses[i] - ideal_masses[i])
-	for i in range(sieve_number):
-		print('sieve:', sieves[i], 'finer:', finers[i], 'ideal volumes:', ideal_volumes[i], 'volume:', volumes[i], 'ideal mass:', ideal_masses[i], 'mass:', masses[i], 'difference:', differences[i])
-	print('void ratio:', voidratio,'totalmass:', totalmass, 'totalvolume', totalvolume)
+	_print_result.printResult(real_volumes, density, ideal_masses, sieve_number, sieves, finers, ideal_volumes, volumes, voidratio, totalmass, totalvolume)
 
 	# plot the particle size distribution curve
-	#_plot.plotCurve(finers, soil_distributions, roundRadius, maximums, unit)
+	_plot.plotCurve(finers, soil_distributions, roundRadius, maximums, unit)
 
 main_program()
