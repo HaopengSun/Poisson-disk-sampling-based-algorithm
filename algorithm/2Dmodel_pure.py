@@ -4,20 +4,26 @@ import _distance2d
 import _random_vector_function
 import _Circle
 import _exportdata
+import _radii
+import _single_radius
 
+# set unit size and canvas size
 unit = 0.0125
 width = 1000
 height = 1000
-active = []
 pi = 3.1415926
 
+# minimum distance of points with Poisson Disk Disktribution
 r = width / 2
 k = 30
 root = 2 ** 0.5
 w = r / root
+active = []
 
+# cell size for void filling process
 w1 = 4
 
+# Particle size distribution
 maximums = [190, 94, 67, 23, 15,  11, 5, 3, 2]
 roundRadius = [95, 68, 24, 16, 12, 6, 3, 2]
 
@@ -262,13 +268,6 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	gridnum = list(range(0, gridnumbers1))
 	remove_cells(roundRadius)
 
-	for i in range(len(Circles)):
-		col_sub = math.floor(Circles[i].x / w1)
-		row_sub = math.floor(Circles[i].y / w1)
-		numb = col_sub + row_sub * cols1
-		grid1[numb] = 1
-		gridnum.remove(numb)
-
 	# the loop will stop if the mass of this round of infilling reaches the target or it runs out of void grids
 	# the size of divided grids is 5, which can normally covers all round of infilling
 	while totalvolume < ideal_volume and len(gridnum) > 0:
@@ -276,9 +275,9 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		q = np.random.randint(len(gridnum))
 
 		if roundRadius != maximum:
-			n = radii(gridnum[q], roundRadius, rangeRadius, maximum)
+			n = _radii.radii(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 		else:
-			n = single_radius(gridnum[q], roundRadius, rangeRadius, maximum)
+			n = _single_radius.single_radius(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 
 		if n == 0:
 			gridnum.remove(gridnum[q])
@@ -301,94 +300,6 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	
 	print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
-def radii(q, initial_radius, range1, maximum1):
-
-	valid = True
-	yaxis = math.floor(q / cols1)
-	xaxis = math.floor(q - yaxis * cols1)
-
-	w_use = w1
-	x = np.random.randint(math.floor(xaxis * w_use), math.floor((xaxis + 1) * w_use))
-	y = np.random.randint(math.floor(yaxis * w_use), math.floor((yaxis + 1) * w_use))
-
-    #if the randomly selected point in the void grid is too close to borders, it will be deleted.
-	m = initial_radius
-	min_boundary = [x, y, (width - x), (height - y)]
-	min_b = np.amin(min_boundary)
-	if min_b < m:
-		valid = None
-
-    #in the reseaching sphere area with 'mindis' radius
-	min_around = []
-	if valid is True:
-		for j in range(len(Circles)):
-			if ((x - range1) < Circles[j].x < (x + range1)) or ((y - range1) < Circles[j].y < (y + range1)):
-				k = _distance2d.dist(x, y, Circles[j].x, Circles[j].y) - Circles[j].r
-				if (k < m):
-					valid = None
-					break
-				else:
-					min_around.append(k)
-
-    #generate particles
-	if valid is True:
-
-		if not min_around:
-			min_a = 0
-		else:
-			min_a = np.amin(min_around)
-
-		if min_a <= min_b:
-			if min_a <= maximum1:
-				Circles.append(_Circle.Circle(x, y, min_a, width, height))
-				return min_a
-			else:
-				Circles.append(_Circle.Circle(x, y, maximum1, width, height))
-				return maximum1
-		elif min_a > min_b:
-			if min_b <= maximum1:
-				Circles.append(_Circle.Circle(x, y, min_b, width, height))
-				return min_b
-			else:
-				Circles.append(_Circle.Circle(x, y, maximum1, width, height))
-				return maximum1
-	else:
-		return 0
-
-# for the last round of infilling, because there is only one possibility, generating particles with radius 2
-# the program simplifies the process of "adding particles"
-def single_radius(q, initial_radius, range1, maximum1):
-
-	valid = True
-	yaxis = math.floor(q / cols1)
-	xaxis = math.floor(q - yaxis * cols1)
-
-	w_use = w1
-	x = np.random.randint(math.floor(xaxis * w_use), math.floor((xaxis + 1) * w_use))
-	y = np.random.randint(math.floor(yaxis * w_use), math.floor((yaxis + 1) * w_use))
-
-    #if the randomly selected point in the void grid is too close to borders, it will be deleted.
-	m = initial_radius
-	min_boundary = [x, y, (width - x), (height - y)]
-	min_b = np.amin(min_boundary)
-	if min_b < m:
-		valid = None
-
-    #in the reseaching sphere area with 'mindis' radius
-	min_around = []
-	if valid is True:
-		for j in range(len(Circles)):
-			if ((x - range1) < Circles[j].x < (x + range1)) or ((y - range1) < Circles[j].y < (y + range1)):
-				k = _distance2d.dist(x, y, Circles[j].x, Circles[j].y) - Circles[j].r
-				if (k <  m):
-					valid = None
-					break
-
-    #generate particles
-	if valid is True:
-		Circles.append(_Circle.Circle(x, y, maximum1, width, height))
-	else:
-		return 0
 
 def list_particles():
 	global mass
