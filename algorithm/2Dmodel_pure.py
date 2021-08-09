@@ -9,6 +9,7 @@ import _single_radius
 import _remove_grid
 import _adjustment
 import _mini_radius
+import _plot
 
 # set unit size and canvas size
 unit = 0.0125
@@ -282,5 +283,8 @@ def list_particles():
 	for i in range(sieve_number):
 		print('sieve:', sieves[i], 'finer:', finers[i], 'ideal volumes:', ideal_volumes[i], 'volume:', volumes[i], 'ideal mass:', ideal_masses[i], 'mass:', masses[i], 'difference:', differences[i])
 	print('void ratio:', voidratio,'totalmass:', totalmass, 'totalvolume', totalvolume)
+
+	# plot the particle size distribution curve
+	#_plot.plotCurve(finers, soil_distributions, roundRadius, maximums, unit)
 
 main_program()
