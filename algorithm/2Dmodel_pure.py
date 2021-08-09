@@ -3,6 +3,7 @@ import numpy as np
 import _distance2d
 import _random_vector_function
 import _Circle
+import _exportdata
 
 unit = 0.0125
 width = 1000
@@ -70,7 +71,7 @@ def main_program():
 		if i > 0:
 			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	list_particles()
-	# exportdata()
+	# _exportdata.exportdata(Circles)
 
 def setup_poisson(gridnumbers, cols, rows):
 	for i in range(gridnumbers):
@@ -388,15 +389,6 @@ def single_radius(q, initial_radius, range1, maximum1):
 		Circles.append(_Circle.Circle(x, y, maximum1, width, height))
 	else:
 		return 0
-
-#export CSV file containing positions and radius of particles
-def exportdata():
-	with open('position.csv', 'w', newline='') as new_file:
-		csv_writer = csv.writer(new_file)
-		csv_writer.writerow(['Xcoordination', 'Ycoordination', 'radius'])
-		for i in range(len(Circles)):
-			csv_writer.writerow([Circles[i].x, Circles[i].y, Circles[i].r])
-		print('export csv file')
 
 def list_particles():
 	global mass
