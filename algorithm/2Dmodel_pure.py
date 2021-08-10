@@ -169,6 +169,8 @@ def poisson(r):
 def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum):
 
 	gridnum = list(range(0, gridnumbers1))
+
+	#remove the fully filled cells
 	_remove_grid.remove_cells(roundRadius, Circles, w1, grid1, cols1, rows1)
 
 	# the loop will stop if the mass of this round of infilling reaches the target or it runs out of void grids
@@ -182,7 +184,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		else:
 			n = _single_radius.single_radius(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 
-		if n == 0:
+		if n is False:
 			gridnum.remove(gridnum[q])
 		else:
 			grid1[q] = 1

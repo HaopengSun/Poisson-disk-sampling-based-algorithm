@@ -55,4 +55,4 @@ def radii(q, initial_radius, range1, maximum1, Circles, cols1, w1, width, height
 				Circles.append(_Circle.Circle(x, y, maximum1, width, height))
 				return maximum1
 	else:
-		return 0
+		return False

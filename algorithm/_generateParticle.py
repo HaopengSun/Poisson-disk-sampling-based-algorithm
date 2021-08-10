@@ -1,3 +1,5 @@
+import _distance2d
+
 #particles of "Poisson Disk Sampling" are growing
 def generateCircles_p(mindis, maxi, Circles):
 	growing = []
