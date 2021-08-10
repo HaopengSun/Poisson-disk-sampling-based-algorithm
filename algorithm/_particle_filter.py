@@ -24,6 +24,5 @@ def particleSieve(Circles, sieve_number, real_volumes, maximums, roundRadius):
 			volume_sieve = filter_particles(Circles, roundRadius[i - 1])
 		volumes_reverse.append(volume_sieve)
 	volumes = volumes_reverse[::-1]
-	volumes.remove(0)
 
 	return volumes
