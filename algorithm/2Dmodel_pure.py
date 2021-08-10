@@ -31,7 +31,7 @@ active = []
 w1 = 4
 
 # Particle size distribution
-maximums = [190, 94, 67, 23, 15,  11, 5, 3, 2]
+maximums = [190, 94, 67, 23, 15,  11, 5, 3]
 roundRadius = [95, 68, 24, 16, 12, 6, 3, 2]
 
 ranges = []
@@ -179,6 +179,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		#randomly select a void grid and try to add particles
 		q = np.random.randint(len(gridnum))
 
+		print(roundRadius, maximum)
 		if roundRadius != maximum:
 			n = _radii.radii(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 		else:
