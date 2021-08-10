@@ -34,6 +34,7 @@ w1 = 4
 maximums = [190, 94, 67, 23, 15,  11, 5, 3]
 roundRadius = [95, 68, 24, 16, 12, 6, 3, 2]
 
+# calculate the range where the void filling process searches
 ranges = []
 for maximum in maximums:
 	ranges.append(maximum + maximums[0])
@@ -43,10 +44,12 @@ grid1 = []
 Circles = []
 occupation_poisson = 0
 
+# calculate the number of cells used for the generation of points with Poisson Disk distribution
 cols = math.floor(width / w)
 rows = math.floor(height / w)
 gridnumbers = cols * rows
 
+# calculate the number of cell used for void filling
 cols1 = math.floor(width / w1)
 rows1 = math.floor(height / w1)
 gridnumbers1 = cols1 * rows1
@@ -67,6 +70,7 @@ density = 0.001631
 volume = width * height
 ideal_totalmass = (volume / (target_void_ratio + 1))
 
+# calculate the targets
 ideal_volumes = []
 ideal_masses = []
 for ideal_distribution in ideal_distributions:
@@ -148,6 +152,7 @@ def point_poisson():
 				Circles.append(_Circle.Circle(grid[i][0], grid[i][1], roundRadius[0], width, height))
 				occupation_poisson = occupation_poisson + 1
 
+	# enlarge the particles
 	_generateParticle.generateCircles_p(ranges[0], (maximums[0] - 2), Circles)
 
 	print('poisson disk sampling', occupation_poisson)
@@ -179,12 +184,13 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		#randomly select a void grid and try to add particles
 		q = np.random.randint(len(gridnum))
 
-		print(roundRadius, maximum)
+		# decide the particle radius
 		if roundRadius != maximum:
 			n = _radii.radii(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 		else:
 			n = _single_radius.single_radius(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
 
+		# insert the particle in the canvas
 		if n is False:
 			gridnum.remove(gridnum[q])
 		else:
@@ -197,6 +203,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
 
+	# adjust the volume of particles
 	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles))
 	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles):
 		maximum -= 1
