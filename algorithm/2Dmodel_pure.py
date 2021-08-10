@@ -20,7 +20,7 @@ width = 1000
 height = 1000
 pi = 3.1415926
 
-# minimum distance of points with Poisson Disk Disktribution
+# minimum distance of points with Poisson Disk disktribution
 r = width / 2
 k = 30
 root = 2 ** 0.5
