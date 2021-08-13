@@ -60,7 +60,7 @@ real_volumes = []
 finers = []
 
 # users should input the parameters of the soil in the first place
-target_void_ratio = 0.8
+target_void_ratio = 0.55
 sieves = ['10-4.75', '4.75-3.35', '3.35-2', '2-1', '1-0.85', '0.85-0.5', '0.5-0.3', '0.3-0.2', '0.2-0.1', '<0.1']
 soil_distributions = [1, 0.95, 0.93, 0.9, 0.68, 0.44, 0.20, 0.08, 0.02, 0.005]
 ideal_distributions = [0.05, 0.02, 0.03, 0.22, 0.24, 0.24, 0.12, 0.06, 0.015, 0.005]
