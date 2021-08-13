@@ -35,7 +35,6 @@ def single_radius(q, initial_radius, range1, maximum1, Circles, cols1, w1, width
     #generate particles
 	if valid is True:
 		Circles.append(_Circle.Circle(x, y, maximum1, width, height))
-		print(maximum1)
 		return maximum1
 
 	return False
