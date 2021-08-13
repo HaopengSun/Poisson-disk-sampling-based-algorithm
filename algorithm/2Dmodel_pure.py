@@ -59,7 +59,7 @@ volumes = []
 real_volumes = []
 finers = []
 
-#users should input the parameters of the soil in the first place
+# users should input the parameters of the soil in the first place
 target_void_ratio = 0.6
 sieves = ['4.75-2.36', '2.36-1.7', '1.7-0.6', '0.6-0.4', '0.4-0.3', '0.3-0.15', '0.15-0.075', '<0.074']
 soil_distributions = [1, 0.76, 0.7, 0.47, 0.29, 0.18, 0.05, 0.02]
@@ -80,7 +80,7 @@ def main_program():
 	for i in range(len(sieves)):
 		if i > 0:
 			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
-	list_particles()
+	result()
 	# _exportdata.exportdata(Circles)
 
 def setup_poisson(gridnumbers, cols, rows):
@@ -210,7 +210,7 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 	print('round of infilling:', roundOfInfilling, 'infilling and add:', occupation, totalvolume, ideal_volume)
 
 
-def list_particles():
+def result():
 	global mass
 
 	volumes = _particle_filter.particleSieve(Circles, sieve_number, real_volumes, maximums, roundRadius)
