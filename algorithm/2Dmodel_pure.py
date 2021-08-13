@@ -13,6 +13,7 @@ import _plot
 import _particle_filter
 import _print_result
 import _generateParticle
+import _target
 
 # set unit size and canvas size
 unit = 0.0125
@@ -70,14 +71,9 @@ density = 0.001631
 volume = width * height
 ideal_totalmass = (volume / (target_void_ratio + 1))
 
-# calculate the targets
-ideal_volumes = []
-ideal_masses = []
-for ideal_distribution in ideal_distributions:
-	ideal_volume = math.floor(ideal_totalmass * ideal_distribution)
-	ideal_volumes.append(ideal_volume)
-	ideal_mass = ideal_volume * density * unit ** 2
-	ideal_masses.append(ideal_mass)
+# calculate the volume/mass targets
+ideal_volumes = _target.targetVolumes(ideal_distributions, ideal_totalmass)
+ideal_masses = _target.targetMasses(ideal_distributions, ideal_totalmass, density, unit)
 
 def main_program():
 	poisson(r)
