@@ -10,7 +10,7 @@ def plotCurve(finers, soil_distributions, roundRadius, maximums, unit):
 		real_radius.append(radius * unit)
 
 	plt.title("Particle-size distribution")
-	plt.plot(real_radius, finers, linestyle = 'dashed', label='2D model')
+	plt.plot(real_radius, finers, linestyle = 'dashed', label='3D model')
 	plt.plot(real_radius, soil_distributions, linestyle = 'dotted', label='target soil data')
 	plt.xscale('log',base=10)
 	plt.xlabel("particle size")

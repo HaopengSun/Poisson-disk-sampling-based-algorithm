@@ -4,7 +4,7 @@ import csv, json
 def exportdata(Circles):
 	with open('position.csv', 'w', newline='') as new_file:
 		csv_writer = csv.writer(new_file)
-		csv_writer.writerow(['Xcoordination', 'Ycoordination', 'radius'])
+		csv_writer.writerow(['Xcoordination', 'Ycoordination', 'Zcoordination', 'radius'])
 		for i in range(len(Circles)):
-			csv_writer.writerow([Circles[i].x, Circles[i].y, Circles[i].r])
+			csv_writer.writerow([Circles[i].x, Circles[i].y, Circles[i].z, Circles[i].r])
 		print('export csv file')

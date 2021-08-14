@@ -81,7 +81,7 @@ ideal_masses = _target.targetMasses(ideal_distributions, ideal_totalmass, densit
 def main_program():
 	poisson(r)
 	for i in range(len(sieves)):
-		if i == 1:
+		if i > 0:
 			fill_the_void(i, 0, 0, ideal_volumes[i], roundRadius[i], ranges[i], maximums[i])
 	result()
 	# _exportdata.exportdata(Circles)
@@ -169,19 +169,19 @@ def poisson(r):
 	gradient = width / 100
 	setup_poisson(gridnumbers, cols, rows)
 	if _adjustment.surpass_volume_poisson(5, Circles, ideal_volumes):
-		#volume surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius
+		# volume surpasses the target by more than 20%, remove the particle and regenerate with a larger minimum radius
 		_adjustment.remove_particles(maximums[0], roundRadius[0], Circles)
 		if r + gradient < width:
 			r = r + gradient
 			poisson(r)
 	elif _adjustment.surpass_volume_poisson(2, Circles, ideal_volumes):
-		#volume surpasses the target by more than 2%, shrink the radius
+		# volume surpasses the target by more than 2%, shrink the radius
 		while _adjustment.surpass_volume_poisson(1.02) and _adjustment.stop_recursion(Circles, roundRadius):
 			_adjustment.adjust_radius(-1, Circles, roundRadius)
 		if not _adjustment.surpass_volume_poisson(1, Circles, ideal_volumes):
 			_adjustment.adjust_radius(1, Circles, roundRadius)
 	elif not _adjustment.surpass_volume_poisson(1, Circles, ideal_volumes):
-		#volume does not reach the target, remove the particle and regenerate with a smaller minimum radius
+		# volume does not reach the target, remove the particle and regenerate with a smaller minimum radius
 		_adjustment.remove_particles(maximums[0], roundRadius[0], Circles)
 		r = r - gradient
 		poisson(r)
@@ -190,27 +190,25 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 
 	gridnum = list(range(0, gridnumbers1))
 
-	#remove the fully filled cells
-	_remove_grid.remove_cells(roundRadius, Circles, w1, grid1, cols1, rows1)
+	# remove the fully filled cells
+	_remove_grid.remove_cells(roundRadius, Circles, w1, grid1, cols1, rows1, depths1)
 
-	# the loop will stop if the mass of this round of infilling reaches the target or it runs out of void grids
-	# the size of divided grids is 5, which can normally covers all round of infilling
 	while totalvolume < ideal_volume and len(gridnum) > 0:
 		#randomly select a void grid and try to add particles
 		q = np.random.randint(len(gridnum))
 
 		# decide the particle radius
 		if roundRadius != maximum:
-			n = _radii.radii(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
+			n = _radii.radii(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, depths1, w1, width, height, depth)
 		else:
-			n = _single_radius.single_radius(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, w1, width, height)
+			n = _single_radius.single_radius(gridnum[q], roundRadius, rangeRadius, maximum, Circles, cols1, depths1, w1, width, height, depth)
 
 		# insert the particle in the canvas
 		if n is False:
 			gridnum.remove(gridnum[q])
 		else:
 			grid1[q] = 1
-			totalvolume = totalvolume + math.floor(3.1415926 * n * n)
+			totalvolume = totalvolume + math.floor((4 / 3) * pi * n ** 3)
 			occupation = occupation + 1
 			gridnum.remove(gridnum[q])
 	
@@ -219,7 +217,6 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 		fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, roundRadius, rangeRadius, maximum)
 
 	# adjust the volume of particles
-	print(maximum > roundRadius, totalvolume > ideal_volume * 1.02, not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles))
 	if maximum > roundRadius and totalvolume > ideal_volume * 1.02 and not _mini_radius.particles_mini(maximums[roundOfInfilling], roundRadius, Circles):
 		maximum -= 1
 		_adjustment.remove_particles(maximums[roundOfInfilling], roundRadius, Circles)
@@ -230,7 +227,6 @@ def fill_the_void(roundOfInfilling, totalvolume, occupation, ideal_volume, round
 
 
 def result():
-	global mass
 
 	volumes = _particle_filter.particleSieve(Circles, sieve_number, real_volumes, maximums, roundRadius)
 

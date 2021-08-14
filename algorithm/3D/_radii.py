@@ -3,7 +3,7 @@ import _Sphere
 import math
 import numpy as np
 
-def radii(q, initial_radius, range1, maximum1, Circles, cols1, w1, width, height):
+def radii(q, initial_radius, range1, maximum1, Circles, cols1, depths1, w1, width, height, depth):
 
 	valid = True
 
@@ -24,6 +24,7 @@ def radii(q, initial_radius, range1, maximum1, Circles, cols1, w1, width, height
 		valid = None
 
     #in the reseaching sphere area with 'mindis' radius
+	min_around = []
 	if valid is True:
 		for j in range(len(Circles)):
 			if ((x - range1) < Circles[j].x < (x + range1)) and ((y - range1) < Circles[j].y < (y + range1)) and ((z - range1) < Circles[j].z < (z + range1)):

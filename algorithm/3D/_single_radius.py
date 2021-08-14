@@ -5,7 +5,7 @@ import numpy as np
 
 # for the last round of infilling, because there is only one possibility, generating particles with radius 2
 # the program simplifies the process of "adding particles"
-def single_radius(q, initial_radius, range1, maximum1, Circles, cols1, w1, width, height):
+def single_radius(q, initial_radius, range1, maximum1, Circles, cols1, depths1, w1, width, height, depth):
 
 	valid = True
 	yaxis = math.floor(q / cols1 / depths1)
