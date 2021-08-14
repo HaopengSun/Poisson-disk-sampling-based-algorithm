@@ -1,6 +1,5 @@
 import random, math, csv, json
 import numpy as np
-
 # one unit in the program presents 0.05mm and actual size of canvas is 40mm * 40mm
 unit = 0.05
 
