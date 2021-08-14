@@ -176,7 +176,7 @@ def poisson(r):
 			poisson(r)
 	elif _adjustment.surpass_volume_poisson(2, Circles, ideal_volumes):
 		# volume surpasses the target by more than 2%, shrink the radius
-		while _adjustment.surpass_volume_poisson(1.02) and _adjustment.stop_recursion(Circles, roundRadius):
+		while _adjustment.surpass_volume_poisson(1.02, Circles, ideal_volumes) and _adjustment.stop_recursion(Circles, roundRadius):
 			_adjustment.adjust_radius(-1, Circles, roundRadius)
 		if not _adjustment.surpass_volume_poisson(1, Circles, ideal_volumes):
 			_adjustment.adjust_radius(1, Circles, roundRadius)
