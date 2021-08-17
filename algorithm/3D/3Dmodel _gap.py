@@ -30,7 +30,7 @@ w = r / root
 active = []
 
 # cell size for void filling process
-w1 = 24
+w1 = 8
 
 # Particle size distribution
 maximums = [450, 399, 319, 79, 11, 9, 7, 5, 4]
@@ -63,7 +63,7 @@ real_volumes = []
 finers = []
 
 #users should input the parameters of the soil in the first place
-target_void_ratio = 30
+target_void_ratio = 0.55
 sieves = ['10.5-10', '10-8', '8-2', '2-0.3', '0.3-0.25', '0.25-0.2', '0.2-0.15', '0.15-0.125', '0.125-0.1']
 soil_distributions = [1, 0.83, 0.52, 0.15, 0.15, 0.06, 0.035, 0.015, 0.005]
 ideal_distributions = [0.17, 0.31, 0.37, 0, 0.09, 0.025, 0.02, 0.01, 0.005]
